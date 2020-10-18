@@ -97,3 +97,11 @@
 #page-map .map-popup .leaflet-popup-tip-container {
   display: none;
 }
+
+#search {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+}

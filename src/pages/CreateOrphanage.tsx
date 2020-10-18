@@ -1,6 +1,6 @@
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { Map, Marker, TileLayer } from "react-leaflet";
-import { LatLng, LeafletMouseEvent } from "leaflet";
+import { LatLng, LatLngTuple, LeafletMouseEvent } from "leaflet";
 import { FiPlus, FiSearch } from "react-icons/fi";
 
 import "../styles/pages/create-orphanage.css";
@@ -9,6 +9,7 @@ import happyMapIcon from "../utils/mapIcon";
 import api from "../services/api";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
+import { features } from "process";
 
 export default function CreateOrphanage() {
   const history = useHistory();
@@ -17,7 +18,7 @@ export default function CreateOrphanage() {
 
   const [name, setName] = useState<string>("");
   const [location, setLocation] = useState<string>("");
-  const [centerMap, setCenterMap] = useState<any>([
+  const [centerMap, setCenterMap] = useState<LatLngTuple>([
     -22.036965895,
     -42.1661668410429,
   ]);
@@ -91,12 +92,20 @@ export default function CreateOrphanage() {
       console.log(searchUrl);
 
       axios.get(searchUrl).then((response) => {
+        let temUmLugar = false;
         for (let feature of response.data.features) {
           if (feature.place_type[0] === "region") {
             console.log(feature);
             console.log(feature.center);
+            temUmLugar = true;
             setCenterMap([feature.center[1], feature.center[0]]);
           }
+        }
+        if (!temUmLugar && response.data.features.lenght > 0) {
+          setCenterMap([
+            response.data.features[0].center[1],
+            response.data.features[0].center[0],
+          ]);
         }
       });
     }
@@ -131,7 +140,7 @@ export default function CreateOrphanage() {
             <Map
               center={centerMap}
               style={{ width: "100%", height: 280 }}
-              zoom={15}
+              zoom={9}
               onclick={handleMapClick}
             >
               <TileLayer
